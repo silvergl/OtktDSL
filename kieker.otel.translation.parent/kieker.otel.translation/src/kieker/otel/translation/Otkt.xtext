@@ -23,7 +23,7 @@ DefaultMapping:
 OtelSpan:
 	'Span:' name = ID "{"
 	 (defaultAttributes+= (DefaultAttributes)*)
-	"attributes:" attributes+=SpanAttribute+
+	"attributes:" attributes+=SpanAttribute*
 "}"
 ;
 
@@ -36,12 +36,7 @@ DefaultAttributes:
 ;
 
 
-/*OtelEvent:
-	"Event:"name = ID"{"
-	"message:" message = STRING
-	"time_stamp:" timestampe = INT
-	"}"
-;*/
+
 KiekerMonitoringType :
 	DefaultMonitoringRecord | NewRecord
 ;
@@ -88,11 +83,6 @@ enum Annotation:
 	|MULT = "mult"
 	|DIV = "divide"
 ;
-
-
-
-
-
 
 
 CustomMapping:

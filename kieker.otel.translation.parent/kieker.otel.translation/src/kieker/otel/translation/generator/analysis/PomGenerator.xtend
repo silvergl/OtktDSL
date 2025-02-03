@@ -45,7 +45,7 @@ class PomGenerator {
 					            </manifest>
 					        </archive>
 					        <descriptorRefs>
-					            <descriptorRef>runnable-jar</descriptorRef>
+					            <descriptorRef>jar-with-dependencies</descriptorRef>
 					        </descriptorRefs>
 					    </configuration>
 					    <executions>

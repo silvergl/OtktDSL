@@ -38,10 +38,13 @@ class OtktGenerator extends AbstractGenerator {
 		val List<mappingModel.SpanParam> parentModified = new ArrayList
 		 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
+		
+		
 		val records = resource.allContents.filter(KiekerMonitoringType).toList()
 		val otelSpan = resource.allContents.filter(OtelSpan).toList()
 		val mappingList = resource.allContents.filter(Mapping).toList()
-		var mappingEntry = new BasicEList<SpanAttribute>()
+		
+		
 		var mappingModel = KiekerRecordSpecification.createMappingModel
 		var mappingModelMappings = mappingModel.getMappings
 
@@ -50,6 +53,7 @@ class OtktGenerator extends AbstractGenerator {
 		val  parentlyModifiedAttributes = new ArrayList();
 		
 		
+		// sort modified attributes into globaly and parently modified
 		
 		for ( attr : otelSpan.get(0).getAttributes) {
 			if (!attr.getAnnotation.getLiteral.equals("default")) {
@@ -61,30 +65,47 @@ class OtktGenerator extends AbstractGenerator {
 			}
 		}
 		
+		
+		// sort modified attributes into globaly and parently 
+		// into default mappings
 		for(mapping:mappingList){
 			if(mapping instanceof DefaultMapping){
 				val kiekerRecord = mapping.getTo
-				this.getMappingForRecord(kiekerRecord, mappingModelMappings)
+				this.extractGlobalOrParentlyAttributes(kiekerRecord, mappingModelMappings)
 				
 			}
 		}
 		
 
+		// instantiate generators
+		// instatiate kiekerexporter generator
 	    val pythonExporterGen = new PythonOtelSdkGenerator(records, otelSpan, mappingList)
 		val result = pythonExporterGen.generate()
 		fsa.generateFile('python/kiekerexporter.py', result)
-		if(!(globalyModifiedAttributes.isEmpty && parentlyModifiedAttributes.isEmpty) || !(this.globalModified.isEmpty && this.parentModified.isEmpty)){
-		val pythonProcessorGen = new PythonProcessorSdk(globalyModifiedAttributes,parentlyModifiedAttributes, globalModified, parentModified)
-		val resultProcessor = pythonProcessorGen.generate()
-		fsa.generateFile('python/kiekerprocessor.py', resultProcessor)
+		
+		// instatiate kiekerprocessor generator, 
+		// if we have any attribute that must be pdated either globaly or parently
+		if (!(globalyModifiedAttributes.isEmpty && parentlyModifiedAttributes.isEmpty) ||
+			!(this.globalModified.isEmpty && this.parentModified.isEmpty)) {
+
+			val pythonProcessorGen = new PythonProcessorSdk(globalyModifiedAttributes, parentlyModifiedAttributes,
+				globalModified, parentModified)
+			val resultProcessor = pythonProcessorGen.generate()
+			fsa.generateFile('python/kiekerprocessor.py', resultProcessor)
+			
 		}
+		
+		// generate custom kieker reciever
 		val analysisGen = new AnalysisGenerator(records, resource)
 		analysisGen.generate(fsa)
 		this.globalModified.clear
 		this.parentModified.clear
 	}
 	
-	def  getMappingForRecord(KiekerRecord record, EList<mappingModel.Mapping> mappings) {
+	
+	
+	
+	def  extractGlobalOrParentlyAttributes(KiekerRecord record, EList<mappingModel.Mapping> mappings) {
 		val recordName = record.getFqClassName
 		for (mapping : mappings) {
 			if (recordName.equals(mapping.getRecordFQClassName)) {

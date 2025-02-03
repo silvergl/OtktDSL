@@ -52,7 +52,7 @@ public class OperationExecutionRecord {
 		Attribute eoi = Util.RECORD_FACTORY.createAttribute();
 		eoi.setName("eoi");
 		eoi.setType("int");
-		record.getAttributes().add(hostname);
+		record.getAttributes().add(eoi);
 		
 		Attribute ess = Util.RECORD_FACTORY.createAttribute();
 		ess.setName("ess");
