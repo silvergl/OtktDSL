@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package
+			uri = "http://www.otel.kieker/translation/Otkt"
+			class = "kieker.otel.translation.otkt.OtktPackage"
+			genModel = "model/generated/Otkt.genmodel" />
+	</extension>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated KiekerRecord -->
+      <package
+            uri="http://otel.kieker/translation/kiekerrecord"
+            class="kiekerrecord.KiekerrecordPackage"
+            genModel="model/KiekerRecord.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated DefaultMapping -->
+      <package
+            uri="http://otel.kieker/translation/mappingmodel"
+            class="mappingModel.MappingModelPackage"
+            genModel="model/DefaultMapping.genmodel"/>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench"
+            name="kieker.otel.tranlsation">
+         <property
+               name="appName"
+               value="kieker.otel.tranlsation">
+         </property>
+      </product>
+   </extension>
+   <extension
+         id="product1"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench"
+            name="kieker.otel.tranlsation">
+         <property
+               name="appName"
+               value="kieker.otel.tranlsation">
+         </property>
+      </product>
+   </extension>
+
+</plugin>

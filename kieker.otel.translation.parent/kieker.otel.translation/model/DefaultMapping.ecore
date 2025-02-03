@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="mappingModel" nsURI="http://otel.kieker/translation/mappingmodel"
+    nsPrefix="mappingModel">
+  <eClassifiers xsi:type="ecore:EClass" name="MappingModel">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Mappings" lowerBound="1"
+        upperBound="-1" eType="#//Mapping" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MappingRule">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="from" eType="#//SpanParam"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpanParam">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="paramType" eType="#//ParamType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="paramName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="annotation" eType="#//Annotation"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="Type" eType="#//Type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ParamType">
+    <eLiterals name="DEFAULT"/>
+    <eLiterals name="Standard" value="1"/>
+    <eLiterals name="Attribute" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Annotation">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dependency" eType="#//Dependency"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Dependency">
+    <eLiterals name="DEFAULT"/>
+    <eLiterals name="GLOBAL" value="1"/>
+    <eLiterals name="PARENT" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Mapping">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mappingRules" upperBound="-1"
+        eType="#//MappingRule"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="recordFQClassName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Type">
+    <eLiterals name="INT"/>
+    <eLiterals name="LONG" value="1"/>
+    <eLiterals name="BOOL" value="2"/>
+    <eLiterals name="STRING" value="3"/>
+    <eLiterals name="DOUBLE" value="4"/>
+    <eLiterals name="FLOAT" value="5"/>
+    <eLiterals name="DEFAULT" value="6"/>
+  </eClassifiers>
+</ecore:EPackage>

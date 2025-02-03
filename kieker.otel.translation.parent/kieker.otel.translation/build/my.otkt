@@ -1,0 +1,52 @@
+model KiekerRecords
+Span: as {
+	trace: string trace
+	parentTrace: string parentspan
+	spanId: string spanId
+    //default: string das false
+	attributes: int num
+	string number 
+	events: Event: asd{
+		message: "zf"
+		time_stamp:12
+	}
+}
+new: ExampleRecord {
+	string number
+	int randomNumber
+	string trace
+	string spanid
+	//string parentspan
+	
+}
+
+new: ExampleRecord2 {
+	string trace
+	
+	string foostrace
+	string foosparentspan
+}
+
+
+
+Reuse: BranchingRecord
+
+Mapping: as -> ExampleRecord{
+	as.trace to ExampleRecord.trace
+	as.spanId to ExampleRecord.spanid
+	as.num to ExampleRecord.randomNumber
+	as.number to ExampleRecord.number
+	
+}
+
+
+AnalysisBuild: { 
+	recovery:{
+	 component: ExampleRecord.trace 
+	 operation: ExampleRecord.number
+	 }
+collector:{
+	 23456
+	"hostname"
+}	 
+}

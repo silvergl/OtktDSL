@@ -1,0 +1,153 @@
+grammar kieker.otel.translation.Otkt with org.eclipse.xtext.common.Terminals
+
+generate otkt "http://www.otel.kieker/translation/Otkt"
+import  "http://otel.kieker/translation/kiekerrecord" as kiekerrecord
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+Model:
+main =Main
+;
+Main:
+	(otelSpans+= OtelSpan)*
+	(record+= KiekerMonitoringType)*
+	(mappings+=Mapping)*
+	collector = Collector;
+
+Mapping:
+	CustomMapping|DefaultMapping
+;
+DefaultMapping:
+	"default" "mapping" from=[OtelSpan|ID] "->" to=[kiekerrecord::KiekerRecord|ID];
+
+
+OtelSpan:
+	'Span:' name = ID "{"
+	 (defaultAttributes+= (DefaultAttributes)*)
+	"attributes:" attributes+=SpanAttribute+
+"}"
+;
+
+DefaultAttributes:
+	"trace:" trace = SpanAttribute|
+	"parentTrace:" parentTrace = SpanAttribute|
+	"spanId:" spanId = SpanAttribute|
+	"startT:" startTime = SpanAttribute|
+	"endT:" endTime = SpanAttribute
+;
+
+
+/*OtelEvent:
+	"Event:"name = ID"{"
+	"message:" message = STRING
+	"time_stamp:" timestampe = INT
+	"}"
+;*/
+KiekerMonitoringType :
+	DefaultMonitoringRecord | NewRecord
+;
+DefaultMonitoringRecord:
+	"Reuse:" name=[kiekerrecord::KiekerRecord|ID];
+
+
+
+NewRecord:
+	
+	"new:" name = ID  
+	type = RecordType "{"
+	attributes+=RecordAttribute+
+	"}"
+;
+
+enum RecordType:
+	 Flow = "flow"
+	|Normal = "normal"
+	|Beforeafter = "beforeafter"
+;
+
+RecordAttribute:
+	type = Type
+	name = ID;
+
+SpanAttribute:
+	(type = Type)? 
+	name = ID
+	(annotation = Annotation "by" value = INT "dependsOn:" dependency = Dependency )?
+	//(default = BOOLEAN)?
+		;
+
+enum Dependency:
+	DEFAULT = "default"
+	|Global = "global"
+	|Parent = "parent"
+;
+
+enum Annotation:
+	DEFAULT = "default"
+	|INC = "inc"
+	|DEC = "dec"
+	|MULT = "mult"
+	|DIV = "divide"
+;
+
+
+
+
+
+
+
+CustomMapping:
+	"Mapping:" from=[OtelSpan|ID] "->" to=[ecore::EObject|ID]"{"
+	 
+	 (mappingRules+=MappingRule)+
+	 "}"
+	;
+
+MappingRule:
+	leftSide = OtelRef "to" rightSide = KiekerReference 
+	
+;
+
+
+
+enum Type:
+	Default = "default"
+	| Int = "int"
+	|String ="string"
+	|Long = "long"
+	|Float = "float"
+	|Double= "double"
+	|Bool= "bool"
+;
+
+
+OtelRef:
+	refEntity=[ecore::EObject|ID] '.' refAttribute=[SpanAttribute|ID]
+;
+
+KiekerReference:
+    refEntity=[ecore::EObject|ID] '.' refAttribute=[ecore::EObject|ID];
+
+
+Collector:
+	"collector:" "{"
+		"port:" port = INT
+		"hostname:" hostname = STRING
+	"}"
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
