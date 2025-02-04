@@ -18,9 +18,6 @@ import java.util.HashMap
 
 class PythonOtelSdkGenerator {
 
-
-
-	List<KiekerMonitoringType> records
 	List<NewRecord> newRecords = new ArrayList()
 	List<DefaultMonitoringRecord> defaultRecords = new ArrayList()
 
@@ -32,6 +29,7 @@ class PythonOtelSdkGenerator {
 	PythonGenerator pythonGeneratorDefaultRecord
 	PythonGenerator pythonGeneratorDefaultMapping
 	List <OtelSpan> spans;
+	
 	new(List<KiekerMonitoringType> records, List <OtelSpan> spans, List<Mapping> mappings) {
 		this.spans = spans
 		this.mappings = mappings

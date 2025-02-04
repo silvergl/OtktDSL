@@ -26,6 +26,7 @@ import java.util.HashMap
 import mappingModel.Annotation
 import java.util.List
 import kieker.otel.translation.otkt.SpanAttribute
+import kieker.otel.translation.generator.python.OtelInitGenerator
 
 /**
  * Generates code from your model files on save.
@@ -38,24 +39,19 @@ class OtktGenerator extends AbstractGenerator {
 		val List<mappingModel.SpanParam> parentModified = new ArrayList
 		 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		
-		
+
 		val records = resource.allContents.filter(KiekerMonitoringType).toList()
 		val otelSpan = resource.allContents.filter(OtelSpan).toList()
 		val mappingList = resource.allContents.filter(Mapping).toList()
-		
-		
+
 		var mappingModel = KiekerRecordSpecification.createMappingModel
 		var mappingModelMappings = mappingModel.getMappings
 
-		
-		val  globalyModifiedAttributes = new ArrayList();
-		val  parentlyModifiedAttributes = new ArrayList();
-		
-		
+		val globalyModifiedAttributes = new ArrayList();
+		val parentlyModifiedAttributes = new ArrayList();
+
 		// sort modified attributes into globaly and parently modified
-		
-		for ( attr : otelSpan.get(0).getAttributes) {
+		for (attr : otelSpan.get(0).getAttributes) {
 			if (!attr.getAnnotation.getLiteral.equals("default")) {
 				if (attr.getDependency.getLiteral.equals("global")) {
 					globalyModifiedAttributes.add(attr)
@@ -64,25 +60,24 @@ class OtktGenerator extends AbstractGenerator {
 				}
 			}
 		}
-		
-		
+
 		// sort modified attributes into globaly and parently 
 		// into default mappings
-		for(mapping:mappingList){
-			if(mapping instanceof DefaultMapping){
+		for (mapping : mappingList) {
+			if (mapping instanceof DefaultMapping) {
 				val kiekerRecord = mapping.getTo
 				this.extractGlobalOrParentlyAttributes(kiekerRecord, mappingModelMappings)
-				
+
 			}
 		}
-		
 
 		// instantiate generators
 		// instatiate kiekerexporter generator
-	    val pythonExporterGen = new PythonOtelSdkGenerator(records, otelSpan, mappingList)
+		val pythonExporterGen = new PythonOtelSdkGenerator(records, otelSpan, mappingList)
 		val result = pythonExporterGen.generate()
 		fsa.generateFile('python/kiekerexporter.py', result)
-		
+        
+        var OtelInitGenerator otelInit = new OtelInitGenerator(true)
 		// instatiate kiekerprocessor generator, 
 		// if we have any attribute that must be pdated either globaly or parently
 		if (!(globalyModifiedAttributes.isEmpty && parentlyModifiedAttributes.isEmpty) ||
@@ -92,9 +87,14 @@ class OtktGenerator extends AbstractGenerator {
 				globalModified, parentModified)
 			val resultProcessor = pythonProcessorGen.generate()
 			fsa.generateFile('python/kiekerprocessor.py', resultProcessor)
-			
+			fsa.generateFile('python/otelinit.py', otelInit.generate)
+
+		}else{
+			otelInit.setGenerateProcessor(false)
+			fsa.generateFile('python/otelinit.py', otelInit.generate)
 		}
 		
+
 		// generate custom kieker reciever
 		val analysisGen = new AnalysisGenerator(records, resource)
 		analysisGen.generate(fsa)
