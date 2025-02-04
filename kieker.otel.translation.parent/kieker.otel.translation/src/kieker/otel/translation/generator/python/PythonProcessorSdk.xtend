@@ -36,11 +36,12 @@ class PythonProcessorSdk {
 	import threading
 	
 	span_registry = {}
+	
 	«FOR attr: this.globalyModifiedAttributes»
-	_«attr.getName» = 0
+	_«attr.getName»_trace_registry = {}
 	«ENDFOR»
 	«FOR attr : globalDefaults»
-	_«attr.getParamName» = 0
+	_«attr.getParamName»_trace_registry = {}
 	«ENDFOR»
 	class IncrementAttributeSpanProcessor(SpanProcessor):
 		_lock = threading.Lock()
@@ -49,9 +50,14 @@ class PythonProcessorSdk {
 			pass
 	
 		def on_start(self, span: Span, parent_context):
-			global span_registry
+			global span_registry,
+			«initTraceRegistries»
 			span_id = span.get_span_context().span_id
+			trace_id = span.get_span_context().trace_id
 			span_registry[span_id] = span
+			
+			«updateRegistries»
+			
 			«handleGlobalModifiers()»
 			
 			«handleParentModifiers()»
@@ -63,23 +69,25 @@ class PythonProcessorSdk {
 	}
 	
 	
-	def updateParentValue(SpanAttribute attr){
-		switch(attr.getAnnotation.getLiteral){
+	private def updateParentValue(SpanAttribute attr) {
+		switch (attr.getAnnotation.getLiteral) {
 			case "inc": '''IncrementAttributeSpanProcessor._«attr.getName»+=«attr.getValue»'''
-			case "dec":'''IncrementAttributeSpanProcessor._«attr.getName»-=«attr.getValue»'''
-			case "mult":'''IncrementAttributeSpanProcessor._«attr.getName»*=«attr.getValue»'''
-			case "divide":'''IncrementAttributeSpanProcessor._«attr.getName»/=«attr.getValue»'''
-			default: throw new Exception("Invalid Annotation")
+			case "dec": '''IncrementAttributeSpanProcessor._«attr.getName»-=«attr.getValue»'''
+			case "mult": '''IncrementAttributeSpanProcessor._«attr.getName»*=«attr.getValue»'''
+			case "divide": '''IncrementAttributeSpanProcessor._«attr.getName»/=«attr.getValue»'''
+			default:
+				throw new Exception("Invalid Annotation")
 		}
 	}
-	
-		def updatePGlobalValue(SpanAttribute attr){
-		switch(attr.getAnnotation.getLiteral){
-			case "inc": '''«attr.getName»+=«attr.value»'''
-			case "dec":'''«attr.getName»-=«attr.value»'''
-			case "mult":'''«attr.getName»*=«attr.value»'''
-			case "divide":'''«attr.getName»/=«attr.value»'''
-			default: throw new Exception("Invalid Annotation")
+
+	private def updatePGlobalValue(SpanAttribute attr) {
+		switch (attr.getAnnotation.getLiteral) {
+			case "inc": '''_«attr.getName»_trace_registry[trace_id]+=«attr.value»'''
+			case "dec": '''_«attr.getName»_trace_registry[trace_id]-=«attr.value»'''
+			case "mult": '''_«attr.getName»_trace_registry[trace_id]*=«attr.value»'''
+			case "divide": '''_«attr.getName»_trace_registry[trace_id]/=«attr.value»'''
+			default:
+				throw new Exception("Invalid Annotation")
 		}
 	}
 	
@@ -89,13 +97,13 @@ class PythonProcessorSdk {
 				
 				«FOR attr: this.globalyModifiedAttributes»
 				global _«attr.getName»
-				span.set_attribute("«attr.getName»",IncrementAttributeSpanProcessor._«attr.getName»)
+				span.set_attribute("«attr.getName»", _«attr.getName»_trace_registry[trace_id])
 				«updatePGlobalValue(attr)»
 				«ENDFOR»
 				«FOR attr : globalDefaults»
 				global _«attr.getParamName»
-				span.set_attribute("«attr.getParamName»",_«attr.getParamName»)
-				_«attr.getParamName»+=«attr.getAnnotation.getValue»
+				span.set_attribute("«attr.getParamName»",_«attr.getParamName»_trace_registry[trace_id])
+				_«attr.getParamName»_trace_registry[trace_id]+=«attr.getAnnotation.getValue»
 				«ENDFOR»
 	        «ENDIF»
 	'''
@@ -130,6 +138,29 @@ class PythonProcessorSdk {
 	}
 	
 	
+	private def initTraceRegistries() {
+		'''
+ 		global «FOR attr : this.globalyModifiedAttributes SEPARATOR ","»_«attr.getName»_trace_registry«ENDFOR»
+ 		global «FOR attr : globalDefaults SEPARATOR ","»_«attr.getParamName»_trace_registry«ENDFOR»
+		'''
+	}
 	
+	private def updateRegistries() {
+		'''
+			«IF !this.globalyModifiedAttributes.empty»
+				if trace_id not in _«this.globalyModifiedAttributes.get(0).getName»_trace_registry:
+					«FOR attr : this.globalyModifiedAttributes»
+						«attr.getName»_trace_registry[span.get_span_context().trace_id] = 0
+					«ENDFOR»
+			«ENDIF»
+				
+			«IF !this.globalDefaults.empty»
+				if trace_id not in _«this.globalDefaults.get(0).getParamName»_trace_registry:
+					«FOR attr : this.globalDefaults»
+					_«attr.getParamName»_trace_registry[span.get_span_context().trace_id] = 0
+					«ENDFOR»
+				«ENDIF»
+		'''
+	}
 	
 }

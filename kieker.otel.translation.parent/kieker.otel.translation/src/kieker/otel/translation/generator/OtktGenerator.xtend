@@ -107,6 +107,7 @@ class OtktGenerator extends AbstractGenerator {
 	
 	def  extractGlobalOrParentlyAttributes(KiekerRecord record, EList<mappingModel.Mapping> mappings) {
 		val recordName = record.getFqClassName
+		val filteredMappings = mappings.filter[it.getRecordFQClassName.equals(recordName)]
 		for (mapping : mappings) {
 			if (recordName.equals(mapping.getRecordFQClassName)) {
 				for (rule : mapping.getMappingRules) {
