@@ -89,13 +89,13 @@ class PythonProcessorSdk {
 				
 				«FOR attr: this.globalyModifiedAttributes»
 				global _«attr.getName»
-				«updatePGlobalValue(attr)»
 				span.set_attribute("«attr.getName»",IncrementAttributeSpanProcessor._«attr.getName»)
+				«updatePGlobalValue(attr)»
 				«ENDFOR»
 				«FOR attr : globalDefaults»
 				global _«attr.getParamName»
-				_«attr.getParamName»+=«attr.getAnnotation.getValue»
 				span.set_attribute("«attr.getParamName»",_«attr.getParamName»)
+				_«attr.getParamName»+=«attr.getAnnotation.getValue»
 				«ENDFOR»
 	        «ENDIF»
 	'''
