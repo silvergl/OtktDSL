@@ -50,7 +50,7 @@ class PythonProcessorSdk {
 			pass
 	
 		def on_start(self, span: Span, parent_context):
-			global span_registry,
+			global span_registry
 			«initTraceRegistries»
 			span_id = span.get_span_context().span_id
 			trace_id = span.get_span_context().trace_id
@@ -140,8 +140,12 @@ class PythonProcessorSdk {
 	
 	private def initTraceRegistries() {
 		'''
- 		global «FOR attr : this.globalyModifiedAttributes SEPARATOR ","»_«attr.getName»_trace_registry«ENDFOR»
- 		global «FOR attr : globalDefaults SEPARATOR ","»_«attr.getParamName»_trace_registry«ENDFOR»
+			«IF !this.globalyModifiedAttributes.empty»
+			global «FOR attr : this.globalyModifiedAttributes SEPARATOR ","»_«attr.getName»_trace_registry«ENDFOR»
+			«ENDIF»
+			«IF !this.globalDefaults.empty»
+			global «FOR attr : globalDefaults SEPARATOR ","»_«attr.getParamName»_trace_registry«ENDFOR»
+			«ENDIF»
 		'''
 	}
 	
