@@ -75,7 +75,7 @@ class OtktGenerator extends AbstractGenerator {
 		// instatiate kiekerexporter generator
 		val pythonExporterGen = new PythonOtelSdkGenerator(records, otelSpan, mappingList)
 		val result = pythonExporterGen.generate()
-		fsa.generateFile('python/kiekerexporter.py', result)
+		fsa.generateFile('otkt/kiekerexporter.py', result)
         
         var OtelInitGenerator otelInit = new OtelInitGenerator(true)
 		// instatiate kiekerprocessor generator, 
@@ -86,12 +86,12 @@ class OtktGenerator extends AbstractGenerator {
 			val pythonProcessorGen = new PythonProcessorSdk(globalyModifiedAttributes, parentlyModifiedAttributes,
 				globalModified, parentModified)
 			val resultProcessor = pythonProcessorGen.generate()
-			fsa.generateFile('python/kiekerprocessor.py', resultProcessor)
-			fsa.generateFile('python/otelinit.py', otelInit.generate)
+			fsa.generateFile('otkt/kiekerprocessor.py', resultProcessor)
+			fsa.generateFile('otkt/otelinit.py', otelInit.generate)
 
 		}else{
 			otelInit.setGenerateProcessor(false)
-			fsa.generateFile('python/otelinit.py', otelInit.generate)
+			fsa.generateFile('otkt/otelinit.py', otelInit.generate)
 		}
 		
 
