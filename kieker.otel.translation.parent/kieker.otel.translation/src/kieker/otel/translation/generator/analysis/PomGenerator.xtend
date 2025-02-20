@@ -115,6 +115,12 @@ class PomGenerator {
 				<artifactId>jaxb-impl</artifactId>
 				<version>4.0.5</version>
 				</dependency>
+				</dependency>
+				<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.5.15</version>
+				</dependency>
 			</dependencies>
 				
 				</project>'''
