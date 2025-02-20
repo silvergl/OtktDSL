@@ -29,7 +29,7 @@ OtelSpan:
 
 DefaultAttributes:
 	"trace:" trace = SpanAttribute|
-	"parentTrace:" parentTrace = SpanAttribute|
+	"parentSpan:" parentTrace = SpanAttribute|
 	"spanId:" spanId = SpanAttribute|
 	"startT:" startTime = SpanAttribute|
 	"endT:" endTime = SpanAttribute
