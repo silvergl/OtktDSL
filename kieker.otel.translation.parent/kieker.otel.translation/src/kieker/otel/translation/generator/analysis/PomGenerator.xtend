@@ -63,7 +63,7 @@ class PomGenerator {
 				<dependency>
 				  <groupId>net.kieker-monitoring</groupId>
 				  <artifactId>kieker</artifactId>
-				  <version>2.0.0-SNAPSHOT</version>
+				  <version>2.0.2</version>
 				</dependency>
 				<dependency>
 				    <groupId>net.sourceforge.teetime</groupId>
